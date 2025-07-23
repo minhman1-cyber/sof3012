@@ -10,7 +10,14 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-@WebServlet(name = "StudentServlet", value = {"/students/hien-thi", "/students/them", "/students/sua", "/students/viewSua", "/students/xoa"})
+@WebServlet(name = "StudentServlet", value = {
+        "/students/hien-thi",
+        "/students/them",
+        "/students/sua",
+        "/students/viewSua",
+        "/students/xoa",
+        "/students/paging"
+})
 public class StudentServlet extends HttpServlet {
 
     private StudentService studentService = new StudentService();
@@ -27,8 +34,25 @@ public class StudentServlet extends HttpServlet {
             case "/students/viewSua":
                 view_sua(request, response);
                 break;
+            case "/students/paging":
+                pagination(request, response);
+                break;
         }
 
+    }
+
+    private void pagination(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        int page = Integer.parseInt(request.getParameter("page"));
+        int size = 2;
+
+        List<Student> students = studentService.getStudentsByPage(page, size);
+        long total = studentService.countStudents();
+        int totalPages = (int) Math.ceil((double) total / size);
+
+        request.setAttribute("students", students);
+        request.setAttribute("totalPages", totalPages);
+        request.setAttribute("currentPage", page);
+        request.getRequestDispatcher("/view/StudentList.jsp").forward(request, response);
     }
 
     private void xoa(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -38,9 +62,20 @@ public class StudentServlet extends HttpServlet {
     }
 
     private void listStudents(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        List<Student> students = new ArrayList<>();
-        students = studentService.getStudents();
+//        List<Student> students = new ArrayList<>();
+//        students = studentService.getStudents();
+//        request.setAttribute("students", students);
+//        request.getRequestDispatcher("/view/StudentList.jsp").forward(request, response);
+        int page = 1;
+        int size = 2;
+
+        List<Student> students = studentService.getStudentsByPage(page, size);
+        long total = studentService.countStudents();
+        int totalPages = (int) Math.ceil((double) total / size);
+
         request.setAttribute("students", students);
+        request.setAttribute("totalPages", totalPages);
+        request.setAttribute("currentPage", page);
         request.getRequestDispatcher("/view/StudentList.jsp").forward(request, response);
     }
 

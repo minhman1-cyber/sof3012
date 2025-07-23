@@ -52,4 +52,16 @@ public class StudentRepo {
             e.printStackTrace();
         }
     }
+
+    public List<Student> getStudentsByPage(int page, int size) {
+        return em.createQuery("SELECT s FROM Student s", Student.class)
+                .setFirstResult((page - 1) * size)  // OFFSET
+                .setMaxResults(size)                // LIMIT
+                .getResultList();
+    }
+
+    public long countStudents() {
+        return em.createQuery("SELECT COUNT(s) FROM Student s", Long.class)
+                .getSingleResult();
+    }
 }

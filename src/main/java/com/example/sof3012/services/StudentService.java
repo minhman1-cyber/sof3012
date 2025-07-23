@@ -27,4 +27,12 @@ public class StudentService {
     public Student getStudent(Long id) {
         return studentRepo.getStudent(id);
     }
+
+    public List<Student> getStudentsByPage(int page, int size) {
+        return studentRepo.getStudentsByPage(page, size);
+    }
+
+    public long countStudents() {
+        return studentRepo.countStudents();
+    }
 }
