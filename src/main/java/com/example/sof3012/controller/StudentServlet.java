@@ -7,6 +7,7 @@ import jakarta.servlet.http.*;
 import jakarta.servlet.annotation.*;
 
 import java.io.IOException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,43 +16,52 @@ import java.util.List;
         "/students/them",
         "/students/sua",
         "/students/viewSua",
-        "/students/xoa",
-        "/students/paging"
+        "/students/xoa"
 })
 public class StudentServlet extends HttpServlet {
 
     private StudentService studentService = new StudentService();
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String path = request.getServletPath();
         switch (path) {
             case "/students/hien-thi":
-                listStudents(request, response);
+                hienThi(request, response);
                 break;
             case "/students/xoa":
                 xoa(request, response);
                 break;
             case "/students/viewSua":
-                view_sua(request, response);
-                break;
-            case "/students/paging":
-                pagination(request, response);
+                viewSua(request, response);
                 break;
         }
-
     }
 
-    private void pagination(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        int page = Integer.parseInt(request.getParameter("page"));
-        int size = 2;
+    private void hienThi(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String keyword = request.getParameter("keyword");
+        String pageParam = request.getParameter("page");
 
-        List<Student> students = studentService.getStudentsByPage(page, size);
-        long total = studentService.countStudents();
+        int page = (pageParam != null) ? Integer.parseInt(pageParam) : 1;
+        int size = 5;
+
+        List<Student> students;
+        long total;
+
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            students = studentService.getStudentsByNameAndPage(keyword, page, size);
+            total = studentService.countStudentsByKeyword(keyword);
+        } else {
+            students = studentService.getStudentsByPage(page, size);
+            total = studentService.countStudents();
+        }
+
         int totalPages = (int) Math.ceil((double) total / size);
 
         request.setAttribute("students", students);
-        request.setAttribute("totalPages", totalPages);
         request.setAttribute("currentPage", page);
+        request.setAttribute("totalPages", totalPages);
+        request.setAttribute("keyword", keyword); // để giữ lại trong ô tìm kiếm
         request.getRequestDispatcher("/view/StudentList.jsp").forward(request, response);
     }
 
@@ -61,22 +71,10 @@ public class StudentServlet extends HttpServlet {
         response.sendRedirect("/students/hien-thi");
     }
 
-    private void listStudents(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-//        List<Student> students = new ArrayList<>();
-//        students = studentService.getStudents();
-//        request.setAttribute("students", students);
-//        request.getRequestDispatcher("/view/StudentList.jsp").forward(request, response);
-        int page = 1;
-        int size = 2;
-
-        List<Student> students = studentService.getStudentsByPage(page, size);
-        long total = studentService.countStudents();
-        int totalPages = (int) Math.ceil((double) total / size);
-
-        request.setAttribute("students", students);
-        request.setAttribute("totalPages", totalPages);
-        request.setAttribute("currentPage", page);
-        request.getRequestDispatcher("/view/StudentList.jsp").forward(request, response);
+    private void viewSua(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        Long id = Long.parseLong(request.getParameter("id"));
+        request.setAttribute("students", studentService.getStudent(id));
+        request.getRequestDispatcher("/view/suaStudent.jsp").forward(request, response);
     }
 
     @Override
@@ -90,12 +88,6 @@ public class StudentServlet extends HttpServlet {
                 sua(request, response);
                 break;
         }
-    }
-
-    private void view_sua(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        Long id = Long.parseLong(request.getParameter("id"));
-        request.setAttribute("students", studentService.getStudent(id));
-        request.getRequestDispatcher("/view/suaStudent.jsp").forward(request, response);
     }
 
     private void sua(HttpServletRequest request, HttpServletResponse response) throws IOException {

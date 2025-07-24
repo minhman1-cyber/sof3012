@@ -35,4 +35,12 @@ public class StudentService {
     public long countStudents() {
         return studentRepo.countStudents();
     }
+
+    public long countStudentsByKeyword(String keyword) {
+        return studentRepo.countStudentsByKeyword(keyword);
+    }
+
+    public List<Student> getStudentsByNameAndPage(String keyword, int page, int size) {
+        return studentRepo.getStudentsByNameAndPage(keyword, page, size);
+    }
 }

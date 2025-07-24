@@ -5,6 +5,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
 
+import java.util.Collections;
 import java.util.List;
 
 public class StudentRepo {
@@ -64,4 +65,19 @@ public class StudentRepo {
         return em.createQuery("SELECT COUNT(s) FROM Student s", Long.class)
                 .getSingleResult();
     }
+
+    public List<Student> getStudentsByNameAndPage(String name, int page, int size) {
+        return em.createQuery("SELECT s FROM Student s WHERE s.name LIKE :name", Student.class)
+                .setParameter("name", "%" + name + "%")
+                .setFirstResult((page - 1) * size)
+                .setMaxResults(size)
+                .getResultList();
+    }
+
+    public long countStudentsByKeyword(String name) {
+        return em.createQuery("SELECT COUNT(s) FROM Student s WHERE s.name LIKE :name", Long.class)
+                .setParameter("name", "%" + name + "%")
+                .getSingleResult();
+    }
+
 }

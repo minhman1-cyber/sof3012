@@ -1,25 +1,20 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%--
-  Created by IntelliJ IDEA.
-  User: dotuongminh
-  Date: 18/7/25
-  Time: 12:50
-  To change this template use File | Settings | File Templates.
---%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
 <head>
-    <title>Title</title>
-    <!-- Bootstrap CSS -->
+    <title>Danh sách sinh viên</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-
-    <!-- Bootstrap JS (nếu bạn cần dùng modal, dropdown,...) -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </head>
 <body>
-Thong tin hoc vien
 <div class="container mt-4">
     <h3 class="mb-3">Danh sách sinh viên</h3>
+
+    <form action="/students/hien-thi" class="d-flex mb-3" role="search" method="get">
+        <input name="keyword" value="${keyword}" class="form-control me-2" type="search" placeholder="Tìm kiếm theo tên" />
+        <button class="btn btn-outline-success" type="submit">Tìm kiếm</button>
+    </form>
+
     <table class="table table-bordered table-striped table-hover align-middle">
         <thead class="table-dark text-center">
         <tr>
@@ -47,31 +42,27 @@ Thong tin hoc vien
         </c:forEach>
         </tbody>
     </table>
-    <!-- Pagination sử dụng Bootstrap -->
+
     <nav aria-label="Page navigation example">
         <ul class="pagination justify-content-center">
             <c:forEach begin="1" end="${totalPages}" var="i">
                 <li class="page-item ${i == currentPage ? 'active' : ''}">
-                    <a class="page-link" href="/students/paging?page=${i}">${i}</a>
+                    <a class="page-link"
+                       href="/students/hien-thi?page=${i}${keyword != null ? '&keyword=' += keyword : ''}">${i}</a>
                 </li>
             </c:forEach>
         </ul>
     </nav>
 
+    <hr/>
+    <h4>Thêm sinh viên</h4>
+    <form action="/students/them" method="post">
+        <div class="mb-2">ID: <input type="text" name="id" class="form-control"></div>
+        <div class="mb-2">Tên: <input type="text" name="name" class="form-control"></div>
+        <div class="mb-2">Email: <input type="text" name="email" class="form-control"></div>
+        <div class="mb-2">SĐT: <input type="text" name="phone" class="form-control"></div>
+        <button class="btn btn-primary">Thêm</button>
+    </form>
 </div>
-<form action="/students/them" method="post">
-    Them sinh vien <br>
-    <div>ID: <input type="text" name="id"></div>
-    <br>
-    <div>Ten: <input type="text" name="name"></div>
-    <br>
-    <div>Email: <input type="text" name="email"></div>
-    <br>
-    <div>Phone: <input type="text" name="phone"></div>
-    <br>
-    <button>Thêm</button>
-</form>
-
-
 </body>
 </html>
