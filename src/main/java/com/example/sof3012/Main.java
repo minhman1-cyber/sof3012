@@ -11,6 +11,5 @@ public class Main {
         EntityManager em = emf.createEntityManager();
         System.out.println("DOne::");
 
-        em.createQuery("select s from Student s", Student.class).getResultList().forEach(System.out::println);
     }
 }
